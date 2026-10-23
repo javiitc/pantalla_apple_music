@@ -60,6 +60,7 @@ fun PantallaReproductor() {
                 Text (
                     text = "Bad Bunny",
                     color = Color.Gray,
+                    modifier = Modifier.padding(top = 4.dp),
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Normal,
                     maxLines = 1,
@@ -67,6 +68,8 @@ fun PantallaReproductor() {
                 )
             }
         }
+        Spacer (Modifier.height(4.dp))
+        BarraDuracion()
         Spacer (Modifier.weight(1f))
         BarraVolumen()
         Spacer (Modifier.height(32.dp))
@@ -80,7 +83,7 @@ fun PantallaReproductor() {
 fun BarraVolumen () {
 
     val coloresVolumen = SliderDefaults.colors(
-        activeTrackColor = Color(0xFFC8102E),
+        activeTrackColor = Color(0xFFFFFFFF),
         inactiveTrackColor = Color(0xFFE0E0E0)
     )
     var volumen by remember { mutableFloatStateOf(50f) }
@@ -110,8 +113,53 @@ fun BarraVolumen () {
         }
     }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun BarraDuracion () {
+
+    val coloresVolumen = SliderDefaults.colors(
+        activeTrackColor = Color(0xFFFFFFFF),
+        inactiveTrackColor = Color(0xFFE0E0E0)
+    )
+    val duracion = 138f
+    var posicion by remember { mutableFloatStateOf(0f) }
+
+    val tiempoTranscurrido = tiempo(posicion.toInt())
+    val tiempoRestante = "-${tiempo(duracion.toInt() - posicion.toInt())}"
+
+    Column (modifier = Modifier.fillMaxWidth()) {
+        Slider (
+            value = posicion,
+            onValueChange = { posicion = it },
+            valueRange = 0f..duracion,
+            thumb = {},
+            track = {estado ->
+                SliderDefaults.Track (
+                    sliderState = estado,
+                    colors = coloresVolumen,
+                    modifier = Modifier.height(6.dp),
+                    thumbTrackGapSize = 0.dp,
+                    drawStopIndicator = null
+                )
+            }
+        )
+        Row (modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween) {
+            Text (text = tiempoTranscurrido, fontSize = 12.sp, color = Color.Gray)
+            Text (text = tiempoRestante, fontSize = 12.sp, color = Color.Gray)
+        }
+    }
+}
+
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun PreviewReproductor () {
     PantallaReproductor()
+}
+
+fun tiempo (segundosTotales: Int): String {
+    val min = segundosTotales / 60
+    val segundos = segundosTotales % 60
+    return "%d:%02d".format(min, segundos)
 }
